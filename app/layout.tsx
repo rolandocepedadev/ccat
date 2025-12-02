@@ -10,7 +10,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "CCAT | Collide ",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  description: "Where ideas come together.",
 };
 
 const geistSans = Geist({
@@ -33,13 +33,45 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} ${dmMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.className} ${dmMono.variable} antialiased`}
+        data-animation-ready="false"
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                // Prevent flash of unstyled content during animations
+                document.documentElement.style.setProperty('--animation-state', 'initializing');
+
+                // Mark when page is ready for animations
+                if (document.readyState === 'complete') {
+                  document.body.setAttribute('data-animation-ready', 'true');
+                } else {
+                  document.addEventListener('DOMContentLoaded', () => {
+                    setTimeout(() => {
+                      document.body.setAttribute('data-animation-ready', 'true');
+                    }, 50);
+                  });
+                }
+
+                // Session activity tracking
+                const updateActivity = () => {
+                  try {
+                    sessionStorage.setItem('ccat-last-activity', Date.now().toString());
+                  } catch (e) {}
+                };
+                updateActivity();
+                window.addEventListener('focus', updateActivity);
+                window.addEventListener('visibilitychange', updateActivity);
+              `,
+            }}
+          />
           {children}
         </ThemeProvider>
       </body>

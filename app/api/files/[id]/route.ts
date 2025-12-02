@@ -56,7 +56,6 @@ export async function DELETE(
   } catch (
     err: any // eslint-disable-line @typescript-eslint/no-explicit-any
   ) {
-    console.error(err);
     return new NextResponse(err.message || "Error deleting file", {
       status: 400,
     });

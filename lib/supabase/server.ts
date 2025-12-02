@@ -7,7 +7,29 @@ import { cookies } from "next/headers";
  * it.
  */
 export async function createClient() {
-  const cookieStore = await cookies();
+  let cookieStore;
+
+  try {
+    cookieStore = await cookies();
+  } catch {
+    // Handle prerendering case where cookies() is not available
+
+    // Return a client without cookie support for prerendering
+    return createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return [];
+          },
+          setAll() {
+            // No-op during prerendering
+          },
+        },
+      },
+    );
+  }
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

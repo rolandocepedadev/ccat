@@ -177,7 +177,7 @@ export default function FilesTable({
     <div className="border rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-muted/50">
+          <thead className="bg-muted/50 hidden md:table-header-group">
             <tr>
               <th className="w-12 p-3">
                 <Checkbox
@@ -245,45 +245,54 @@ export default function FilesTable({
                 <tr
                   key={file.id}
                   className={cn(
-                    "border-t hover:bg-muted/30 transition-colors",
+                    "border-t hover:bg-muted/30 transition-colors group",
                     isSelected && "bg-accent/50",
                   )}
                 >
-                  <td className="p-3">
+                  <td className="p-2 md:p-3">
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => onFileSelect(file.id)}
                     />
                   </td>
-                  <td className="p-3">
-                    <div className="flex items-center gap-3">
+                  <td className="p-2 md:p-3">
+                    <div className="flex items-center gap-2 md:gap-3 min-w-0">
                       <FileIcon
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
                           getFileTypeColor(file.mime_type),
                         )}
                       />
-                      <span className="font-medium truncate" title={file.name}>
-                        {file.name}
-                      </span>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span
+                          className="font-medium truncate"
+                          title={file.name}
+                        >
+                          {file.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground md:hidden">
+                          {formatDate(file.created_at)} ·{" "}
+                          {formatFileSize(file.size)}
+                        </span>
+                      </div>
                       {file.starred && (
                         <Star className="h-4 w-4 text-yellow-500 fill-current flex-shrink-0" />
                       )}
                     </div>
                   </td>
-                  <td className="p-3 text-muted-foreground text-sm">
+                  <td className="p-3 text-muted-foreground text-sm hidden md:table-cell">
                     {formatDate(file.created_at)}
                   </td>
-                  <td className="p-3 text-muted-foreground text-sm">
+                  <td className="p-3 text-muted-foreground text-sm hidden md:table-cell">
                     {formatFileSize(file.size)}
                   </td>
-                  <td className="p-3">
+                  <td className="p-2 md:p-3">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
+                          className="h-8 w-8 p-0 md:opacity-0 md:group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
                         >
                           <MoreVertical className="h-4 w-4" />
                         </Button>

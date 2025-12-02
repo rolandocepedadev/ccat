@@ -22,6 +22,16 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/69158db916f2854de7fae735/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: "",
+      },
     ],
     qualities: [75, 90, 95],
   },

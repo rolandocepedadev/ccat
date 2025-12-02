@@ -7,13 +7,22 @@ import FilesTable from "./FilesTable";
 import UploadDialog from "./UploadDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, LayoutGrid, List, Filter, MoreVertical } from "lucide-react";
+import {
+  Search,
+  LayoutGrid,
+  List,
+  Filter,
+  MoreVertical,
+  Menu,
+  Plus,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 interface FileItem {
   id: string;
@@ -32,6 +41,7 @@ export default function FileManager() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const supabase = createClient();
 
@@ -157,48 +167,68 @@ export default function FileManager() {
 
   return (
     <div className="h-full flex bg-background">
-      {/* Sidebar */}
-      <FilesSidebar onUploadClick={() => setUploadDialogOpen(true)} />
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:block">
+        <FilesSidebar onUploadClick={() => setUploadDialogOpen(true)} />
+      </div>
+
+      {/* Mobile Sidebar */}
+      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <FilesSidebar
+            onUploadClick={() => {
+              setUploadDialogOpen(true);
+              setSidebarOpen(false);
+            }}
+          />
+        </SheetContent>
+      </Sheet>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Toolbar */}
-        <div className="border-b bg-background px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="relative w-80">
+        <div className="border-b bg-background px-3 lg:px-6 py-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 lg:gap-4 flex-1 min-w-0">
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="lg:hidden"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+
+              <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search in files"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-sm"
                 />
               </div>
-              {selectedFiles.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {selectedFiles.length} selected
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={bulkDelete}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 lg:gap-2">
+              {selectedFiles.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={bulkDelete}
+                  className="text-destructive hover:text-destructive hidden sm:flex"
+                >
+                  Delete ({selectedFiles.length})
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() =>
                   setViewMode(viewMode === "list" ? "grid" : "list")
                 }
+                className="hidden sm:flex"
               >
                 {viewMode === "list" ? (
                   <LayoutGrid className="h-4 w-4" />
@@ -209,7 +239,7 @@ export default function FileManager() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="hidden sm:flex">
                     <Filter className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -226,7 +256,26 @@ export default function FileManager() {
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() =>
+                      setViewMode(viewMode === "list" ? "grid" : "list")
+                    }
+                    className="sm:hidden"
+                  >
+                    {viewMode === "list" ? "Grid view" : "List view"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="sm:hidden">
+                    Sort
+                  </DropdownMenuItem>
+                  {selectedFiles.length > 0 && (
+                    <DropdownMenuItem
+                      onClick={bulkDelete}
+                      className="sm:hidden text-destructive"
+                    >
+                      Delete ({selectedFiles.length})
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem disabled>New folder</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -235,7 +284,7 @@ export default function FileManager() {
         </div>
 
         {/* File Content */}
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-3 lg:p-6">
           <FilesTable
             files={filteredFiles}
             loading={loading}
@@ -248,6 +297,15 @@ export default function FileManager() {
             onShare={handleShare}
           />
         </div>
+
+        {/* Floating Action Button (Mobile Only) */}
+        <Button
+          onClick={() => setUploadDialogOpen(true)}
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg lg:hidden"
+          size="icon"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
       </div>
 
       {/* Upload Dialog */}

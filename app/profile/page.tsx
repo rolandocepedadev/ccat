@@ -3,12 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 import ProfileForm from "@/components/ProfileForm";
 import { Suspense } from "react";
 import Link from "next/link";
-import { AuthButton } from "@/components/auth-button";
+import { AuthButtonClient } from "@/components/auth-button-client";
 
 import { EnvVarWarning } from "@/components/env-var-warning";
 import { hasEnvVars } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Note: Dynamic export removed due to Next.js 16 Turbopack compatibility
 
 async function AuthenticatedContent() {
   const supabase = await createClient();
@@ -49,13 +51,7 @@ export default function ProfilePage() {
           <div className="flex gap-5 items-center font-semibold">
             <Link href={"/"}>CCAT File Manager</Link>
           </div>
-          {!hasEnvVars ? (
-            <EnvVarWarning />
-          ) : (
-            <Suspense>
-              <AuthButton />
-            </Suspense>
-          )}
+          {!hasEnvVars ? <EnvVarWarning /> : <AuthButtonClient />}
         </div>
       </nav>
 

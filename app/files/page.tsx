@@ -2,11 +2,14 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
 import Link from "next/link";
-import { AuthButton } from "@/components/auth-button";
+import Image from "next/image";
+import { AuthButtonClient } from "@/components/auth-button-client";
 
 import { EnvVarWarning } from "@/components/env-var-warning";
 import { hasEnvVars } from "@/lib/utils";
 import FileManager from "@/components/FileManager";
+
+// Note: Dynamic export removed due to Next.js 16 Turbopack compatibility
 
 async function AuthenticatedContent() {
   const supabase = await createClient();
@@ -29,15 +32,26 @@ export default function FilesPage() {
       <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
         <div className="w-full max-w-full flex justify-between items-center p-3 px-5 text-sm">
           <div className="flex gap-5 items-center font-semibold">
-            <Link href={"/"}>CCAT Drive</Link>
+            <Link href={"/"} className="flex items-center">
+              <Image
+                src="/images/collide-white.png"
+                alt="Collide Logo"
+                width={128}
+                height={32}
+                className="hidden dark:block"
+                priority
+              />
+              <Image
+                src="/images/collide-white.png"
+                alt="Collide Logo"
+                width={128}
+                height={32}
+                className="block dark:hidden invert"
+                priority
+              />
+            </Link>
           </div>
-          {!hasEnvVars ? (
-            <EnvVarWarning />
-          ) : (
-            <Suspense>
-              <AuthButton />
-            </Suspense>
-          )}
+          {!hasEnvVars ? <EnvVarWarning /> : <AuthButtonClient />}
         </div>
       </nav>
 

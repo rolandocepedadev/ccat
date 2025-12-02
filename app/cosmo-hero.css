@@ -1,6 +1,34 @@
+/* Animation State Management */
+:root {
+    --animation-state: ready; /* initializing | ready | running | complete */
+}
+
+/* Prevent flash during animation initialization */
+body[data-animation-ready="false"] .crisp-header {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+body[data-animation-ready="true"]
+    .crisp-header:not(.is--loading):not(.is--hidden) {
+    opacity: 1;
+}
+
+/* Ensure animation always starts from correct state */
+.crisp-header.is--loading.is--hidden {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* Force animation reset when component remounts */
+.crisp-header[data-animation-key] {
+    animation-fill-mode: backwards;
+}
+
 /* Disable Scroll on Loading */
 main:has(.crisp-header.is--loading) {
     height: 100dvh;
+    overflow: hidden;
 }
 
 /* Loader */
@@ -47,6 +75,7 @@ main:has(.crisp-header.is--loading) {
     padding-left: 1em;
     padding-right: 1em;
     position: relative;
+    transform: translate3d(0, 0, 0);
 }
 
 .crisp-loader__media {
@@ -57,15 +86,15 @@ main:has(.crisp-header.is--loading) {
     height: 10em;
     display: flex;
     position: relative;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
 }
 
 .crisp-loader__media.is--scaling {
     will-change: transform;
-    border-radius: 0;
-    transition-property: border-radius;
-    transition-duration: 0.5s;
-    transition-timing-function: cubic-bezier(1, 0, 0, 1);
     display: flex;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
 }
 
 .crisp-loader__cover-img {
@@ -74,10 +103,9 @@ main:has(.crisp-header.is--loading) {
     width: 100%;
     height: 100%;
     position: absolute;
-}
-
-.crisp-loader__media.is--scaling.is--radius {
-    border-radius: 0.5em;
+    top: 0px;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
 }
 
 .crisp-loader__group.is--relative {
@@ -322,12 +350,33 @@ main:has(.crisp-header.is--loading) {
         Haffer XH,
         Arial,
         sans-serif;
-    font-size: calc(5vw + 5dvh);
+    font-size: calc(3.5vw + 5dvh);
     font-weight: 400;
-    line-height: 0.95;
+    line-height: 1.1;
+    overflow: hidden;
+    display: block;
+}
+
+.crisp-header__h1--animated {
+    position: relative;
+    min-height: calc(3.5vw + 5dvh);
+    height: calc(5.5vw + 5dvh);
+    transform: translateZ(0);
+    contain: layout;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .crisp-header__h1 > * {
     margin: -0.1em -0.05em;
     padding: 0.1em 0.05em;
+}
+
+/* Split text animation support */
+.crisp-header__h1 .char {
+    display: inline-block;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
